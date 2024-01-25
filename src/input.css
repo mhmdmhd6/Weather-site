@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .card {
+    @apply flex flex-col md:flex-row items-center justify-around rounded-md bg-sky-300 p-5 gap-2;
+  }
+}

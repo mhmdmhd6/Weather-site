@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>weather app</title>
+
+    <!-- Font awesome -->
+    <!-- <script
+      src="https://kit.fontawesome.com/005843ef69.js"
+      crossorigin="anonymous"
+    ></script> -->
+
+    <link rel="stylesheet" href="output.css" />
+  </head>
+  <body class="bg-sky-600">
+    <header class="flex min-w-full justify-around items-center p-3">
+      <a href="#" class="hidden md:block p-3 bg-slate-300 rounded-md text-lg">
+        <i class="fa-solid fa-cloud"></i>
+        weather
+      </a>
+      <div>
+        <input
+          type="search"
+          class="search__input p-3 pl-3 rounded-lg outline-none bg-slate-800 text-white text-lg mr-3"
+          placeholder="Search a city..."
+        />
+        <button
+          class="search__button bg-indigo-800 text-white text-xl px-4 p-3 rounded-lg"
+        >
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
+      <a
+        href="https://github.com/mhmdmhd6"
+        class="flex gap-2 bg-slate-900 text-white text-lg p-3 rounded-lg shadow-md"
+        target="_blank"
+      >
+        <i class="fa-brands fa-github text-xl"></i>
+        <p class="hidden sm:block">Support Project</p>
+      </a>
+    </header>
+    <main class="container"></main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
