@@ -1,4 +1,8 @@
-"use strict";
+require("dotenv").config();
+
+// Other code follows
+const apiKey = process.env.API_KEY;
+const debugMode = process.env.DEBUG === "true";
 
 const searchButton = document.querySelector(".search__button");
 const searchInput = document.querySelector(".search__input");
@@ -53,7 +57,7 @@ const renderWeather = function (data) {
         <div class="card flex-col">
           <div class="w-full flex justify-between items-center">
             <p>Sunrise:</p>
-            <h1 class="card__sunrise text-2xl text-slate-900">\
+            <h1 class="card__sunrise text-2xl text-slate-900">
               ${timeConvertor(data.sys.sunrise)}
             </h1>
           </div>
@@ -66,7 +70,10 @@ const renderWeather = function (data) {
         </div>
         <div class="card col-span-2"></div>
         <div class="card col-span-2 md:col-span-4">
-          <canvas class="card__chart" width="400" height="200"></canvas>
+          <div class="card__forecast">${fetchForecast(
+            data.coord.lat,
+            data.coord.lon
+          )}</div>
         </div>
       </div>
 `;
@@ -89,10 +96,53 @@ const renderError = function () {
   container.innerHTML = html;
 };
 
+const renderForecast = function (forecastData) {
+  const dateTime = forecastData.dt_txt;
+  const temperature = forecastData.main.temp;
+  const weatherDescription = forecastData.weather[0].description;
+  const weatherIcon = forecastData.weather[0].icon;
+
+  // Create the HTML structure for the forecast item
+  const forecastHTML = `
+    <div class="forecast-item">
+      <p>Date/Time: ${dateTime}</p>
+      <p>Temperature: ${temperature} </p>
+      <p>Weather: ${weatherDescription}</p>
+      <img src="https://openweathermap.org/img/wn/${weatherIcon}.png" alt="Weather Icon">
+    </div>
+  `;
+
+  return forecastHTML;
+};
+
+// Fetch the Forecast API
+
+const fetchForecast = async function (lat, lon) {
+  try {
+    const resForecast = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&cnt=8&appid=${apiKey}&units=metric`
+    );
+
+    const dataForecast = await resForecast.json();
+
+    const forecast = document.querySelector(".card__forecast");
+
+    dataForecast.list.forEach((forecastData) => {
+      const forecastHTML = renderForecast(forecastData);
+      forecast.insertAdjacentHTML("beforeend", forecastHTML);
+      console.log(forecastData);
+    });
+    console.log(dataForecast);
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+
+// Fetch the current weather API
 const fetchWeather = async function (city) {
   try {
     const resWeather = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=71b002d857ecaed077a079f9a107b0a4&units=metric`
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
     );
 
     if (!resWeather.ok) throw new Error("City not found!");
@@ -102,7 +152,7 @@ const fetchWeather = async function (city) {
 
     renderWeather(dataWeather);
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     renderError();
   }
 };
