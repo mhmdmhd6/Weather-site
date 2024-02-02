@@ -2,8 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    font-family: "Comfortaa", system-ui, sans-serif;
+  }
+}
+
 @layer components {
   .card {
-    @apply flex flex-col md:flex-row items-center justify-around rounded-md bg-sky-300 p-5 gap-2;
+    @apply flex flex-col md:flex-row items-center justify-around rounded-md bg-slate-800 p-5 gap-2 text-white border border-slate-500;
+  }
+  .header__button {
+    @apply overflow-hidden scale-x-100 relative after:w-full after:bg-gradient-to-r after:from-cyan-500 after:to-blue-500 after:inset-0 after:absolute after:scale-x-0 after:origin-left after:-z-10 after:transition-transform hover:after:scale-100;
   }
 }

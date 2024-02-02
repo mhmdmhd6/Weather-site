@@ -1,8 +1,4 @@
-require("dotenv").config();
-
-// Other code follows
-const apiKey = process.env.API_KEY;
-const debugMode = process.env.DEBUG === "true";
+import { apiKey } from "./config.js";
 
 const searchButton = document.querySelector(".search__button");
 const searchInput = document.querySelector(".search__input");
@@ -13,6 +9,37 @@ const timeConvertor = function (unixTime) {
   const dateObj = new Date(unixTime * 1000);
   const utcString = dateObj.toUTCString().slice(-11, -4);
   return utcString;
+};
+
+const dateConvertor = function (date) {
+  const months = {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    10: "October",
+    11: "November",
+    12: "December",
+  };
+
+  const monthDate = date.slice(5, 7);
+  let dayDate = date.slice(8, 10);
+  if (Number(dayDate) < 10) {
+    dayDate = date.slice(9, 10);
+  }
+  const timeDate = date.slice(-8);
+
+  return `
+    <div class="forecast__item--date">
+      <p>${dayDate} ${months[monthDate]}</p>
+      <p>${timeDate}</p>
+    </div>
+  `;
 };
 
 const renderWeather = function (data) {
@@ -31,92 +58,124 @@ const renderWeather = function (data) {
 
           <div class="flex flex-col items-center">
             <h1 class="card__temp text-5xl">${Math.round(data.main.temp)}°C</h1>
-            <p class="card__description text-lg">${
-              data.weather[0].description
-            }</p>
+            <p class="card__description text-lg">
+            ${data.weather[0].description}
+            </p>
           </div>
         </div>
         <div class="card">
           <p class="text-xl">Humidity:</p>
-          <h1 class="card__humidity text-4xl text-slate-900">
+          <h1 class="card__humidity text-4xl">
           ${data.main.humidity}%
           </h1>
         </div>
         <div class="card">
           <p class="text-xl">Wind speed:</p>
-          <h1 class="card__wind text-4xl text-slate-900">
-            ${data.wind.speed} km/h
+          <h1 class="card__wind text-4xl">
+            ${data.wind.speed} 
+            <span class="text-xl text-slate-300">km/h</span>
           </h1>
         </div>
         <div class="card">
           <p class="text-xl">Pressure:</p>
-          <h1 class="card__pressure text-4xl text-slate-900">
-          ${data.main.pressure} hPa
+          <h1 class="card__pressure text-4xl">
+          ${data.main.pressure} 
+          <span class="text-xl text-slate-300">hPa</span>
           </h1>
         </div>
         <div class="card flex-col">
           <div class="w-full flex justify-between items-center">
             <p>Sunrise:</p>
-            <h1 class="card__sunrise text-2xl text-slate-900">
+            <h1 class="card__sunrise text-2xl">
               ${timeConvertor(data.sys.sunrise)}
             </h1>
           </div>
           <div class="w-full flex justify-between items-center">
             <p>Sunset:</p>
-              <h1 class="card__sunset text-2xl text-slate-900">
+              <h1 class="card__sunset text-2xl">
                 ${timeConvertor(data.sys.sunset)}
               </h1>
           </div>
         </div>
-        <div class="card col-span-2"></div>
-        <div class="card col-span-2 md:col-span-4">
-          <div class="card__forecast">${fetchForecast(
-            data.coord.lat,
-            data.coord.lon
-          )}</div>
+        <div class="card col-span-2">
+          <div class="card__pollution w-full h-full"></div>
+        </div>
+        <div class="col-span-2 md:col-span-4">
+          <div class="card__forecast w-full h-full grid grid-cols-2 md:grid-cols-4 gap-3"></div>
         </div>
       </div>
 `;
-  // container.insertAdjacentHTML("beforeend", html);
-
   container.innerHTML = html;
 };
 
 const renderError = function () {
   const html = `
   <div class="flex items-center justify-evenly flex-wrap md:flex-nowrap w-4/5 mx-auto">
-    <img src="../images/404.svg" class="w-full md:w-1/2" />
+    <img src="../images/404.svg" class="w-full md:w-1/2" alt="City not found" />
     <p class="text-2xl">
       City not found!
     </p>
   </div>
   `;
-
-  // container.insertAdjacentHTML("beforeend", html);
   container.innerHTML = html;
 };
 
+// Render Forecast
 const renderForecast = function (forecastData) {
   const dateTime = forecastData.dt_txt;
   const temperature = forecastData.main.temp;
   const weatherDescription = forecastData.weather[0].description;
   const weatherIcon = forecastData.weather[0].icon;
 
-  // Create the HTML structure for the forecast item
   const forecastHTML = `
-    <div class="forecast-item">
-      <p>Date/Time: ${dateTime}</p>
-      <p>Temperature: ${temperature} </p>
-      <p>Weather: ${weatherDescription}</p>
-      <img src="https://openweathermap.org/img/wn/${weatherIcon}.png" alt="Weather Icon">
+    <div class="card forecast-item flex items-center justify-around">
+      ${dateConvertor(dateTime)}
+      <img src="https://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="Weather Icon" class="w-16 h-16">
+      <div class="flex flex-col items-center">
+        <p class="text-2xl">${Math.round(temperature)}°C</p>
+        <p>${weatherDescription}</p>
+      </div>
     </div>
   `;
-
   return forecastHTML;
 };
 
-// Fetch the Forecast API
+// Render Air Pollution
+const renderAirPollution = function (data) {
+  const airQuality = {
+    1: { des: "Good", class: "text-green-500" },
+    2: { des: "Fair", class: "text-lime-400" },
+    3: { des: "Moderate", class: "text-yellow-400" },
+    4: { des: "Poor", class: "text-red-400" },
+    5: { des: "Very Poor", class: "text-red-600" },
+  };
+  return `
+  <div class="${airQuality[data.list[0].main.aqi].class} text-4xl">
+    ${airQuality[data.list[0].main.aqi].des}
+  </div>
+  `;
+};
 
+// Fetch the Air Pollution
+const fetchAirPollution = async function (lat, lon) {
+  try {
+    const resPollution = await fetch(
+      `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`
+    );
+
+    const dataPollution = await resPollution.json();
+
+    console.log(dataPollution);
+    console.log(renderAirPollution(dataPollution));
+
+    const pollution = document.querySelector(".card__pollution");
+    pollution.innerHTML = renderAirPollution(dataPollution);
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
+// Fetch the Forecast API
 const fetchForecast = async function (lat, lon) {
   try {
     const resForecast = await fetch(
@@ -128,11 +187,10 @@ const fetchForecast = async function (lat, lon) {
     const forecast = document.querySelector(".card__forecast");
 
     dataForecast.list.forEach((forecastData) => {
-      const forecastHTML = renderForecast(forecastData);
-      forecast.insertAdjacentHTML("beforeend", forecastHTML);
+      const forecastItem = renderForecast(forecastData);
+      forecast.innerHTML += forecastItem;
       console.log(forecastData);
     });
-    console.log(dataForecast);
   } catch (err) {
     console.error(err.message);
   }
@@ -151,14 +209,16 @@ const fetchWeather = async function (city) {
     console.log(dataWeather);
 
     renderWeather(dataWeather);
+    fetchForecast(dataWeather.coord.lat, dataWeather.coord.lon);
+    fetchAirPollution(dataWeather.coord.lat, dataWeather.coord.lon);
   } catch (err) {
-    console.error(err.message);
     renderError();
+    console.error(err.message);
   }
 };
 
+// Event listeners
 searchButton.addEventListener("click", () => fetchWeather(searchInput.value));
-
 searchInput.addEventListener("keyup", (e) => {
   if (e.key === "Enter" && searchInput.value != "") {
     fetchWeather(searchInput.value);

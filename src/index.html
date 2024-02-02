@@ -5,35 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>weather app</title>
 
+    <script defer type="module" src="./script.js"></script>
+
     <!-- Font awesome -->
     <script
       src="https://kit.fontawesome.com/005843ef69.js"
       crossorigin="anonymous"
     ></script>
 
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="output.css" />
   </head>
-  <body class="bg-sky-600">
+  <!-- <body class="bg-sky-600"> -->
+  <body class="bg-slate-950">
     <header class="flex min-w-full justify-around items-center p-3">
-      <a href="#" class="hidden md:block p-3 bg-slate-300 rounded-md text-lg">
+      <a
+        href="#"
+        class="header__button hidden md:block p-3 bg-slate-300 rounded-md text-lg"
+      >
         <i class="fa-solid fa-cloud"></i>
         weather
       </a>
-      <div>
-        <input
-          type="search"
-          class="search__input p-3 pl-3 rounded-lg outline-none bg-slate-800 text-white text-lg mr-3"
-          placeholder="Search a city..."
-        />
+      <div class="flex gap-3">
+        <div
+          class="flex bg-slate-800 rounded-lg items-center border border-transparent duration-200 hover:border-slate-400"
+        >
+          <label for="search__input">
+            <i
+              class="fa-solid fa-location-dot text-slate-500 text-2xl ml-3"
+            ></i>
+          </label>
+          <input
+            type="search"
+            id="search__input"
+            class="search__input p-3 pl-3 bg-transparent outline-none text-white text-lg"
+            placeholder="Search a city..."
+          />
+        </div>
         <button
-          class="search__button bg-indigo-800 text-white text-xl px-4 p-3 rounded-lg"
+          class="search__button bg-gradient-to-tr from-slate-600 to-slate-500 text-white text-xl px-4 p-3 rounded-lg"
         >
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
       </div>
       <a
         href="https://github.com/mhmdmhd6"
-        class="flex gap-2 bg-slate-900 text-white text-lg p-3 rounded-lg shadow-md"
+        class="header__button flex gap-2 bg-slate-300 text-black text-lg p-3 rounded-lg shadow-md"
         target="_blank"
       >
         <i class="fa-brands fa-github text-xl"></i>
@@ -41,6 +65,5 @@
       </a>
     </header>
     <main class="container mx-auto"></main>
-    <script defer type="module" src="./script.js"></script>
   </body>
 </html>
